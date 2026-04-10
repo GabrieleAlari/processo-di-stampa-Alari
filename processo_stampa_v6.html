@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Il Processo di Stampa — Gabriele Alari</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,*{cursor:none!important}
+:root{
+  --ink:#f0e6c8;--ink2:rgba(240,230,200,.6);--ink3:rgba(240,230,200,.22);--ink4:rgba(240,230,200,.1);
+  --d:#0d0a06;--dm:#141009;--dw:#1a1410;
+  --red:#c0392b;--red2:rgba(192,57,43,.35);--gold:#e8a020;--teal:#2d7d6e;--blue:#2c4a8a;
+  --rule:rgba(240,230,200,.1);--rules:rgba(240,230,200,.22);
+  --bb:'Bebas Neue',sans-serif;--pf:'Playfair Display',Georgia,serif;--mn:'DM Mono',monospace;--cr:'Crimson Pro',serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--cr);background:var(--d);color:var(--ink);font-size:17px;line-height:1.75;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9990;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.022}
+
+/* ══ CURSOR ══ */
+#CUR{position:fixed;top:0;left:0;pointer-events:none;z-index:99999}
+#cd{width:7px;height:7px;background:var(--ink);border-radius:50%;position:absolute;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s}
+#cr{width:32px;height:32px;border:1px solid rgba(240,230,200,.4);border-radius:50%;position:absolute;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s}
+#ci{position:absolute;transform:translate(-50%,2px);width:2px;background:linear-gradient(180deg,var(--red),transparent);height:0;transition:height .35s;border-radius:0 0 2px 2px}
+body.hov #cd{width:12px;height:12px;background:var(--red)}
+body.hov #cr{width:50px;height:50px;border-color:rgba(192,57,43,.7)}
+body.hov #ci{height:18px}
+body.drag #cd{width:20px;height:20px;border-radius:3px;background:var(--gold)}
+
+/* ══ LOADER ══ */
+#LD{position:fixed;inset:0;background:var(--d);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .9s,visibility .9s}
+#LD.out{opacity:0;visibility:hidden;pointer-events:none}
+.lt{font-family:var(--bb);font-size:clamp(44px,9vw,90px);color:var(--ink);letter-spacing:.04em;text-align:center;line-height:1}
+.ls{font-family:var(--cr);font-style:italic;font-size:17px;color:rgba(240,230,200,.35);margin:.5rem 0 2.5rem;letter-spacing:.06em}
+/* cylinders row */
+.lcyls{display:flex;align-items:center;gap:0;margin-bottom:1.8rem}
+.lcyl{
+  width:64px;height:64px;border-radius:50%;
+  border:2px solid rgba(240,230,200,.18);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mn);font-size:7.5px;color:rgba(240,230,200,.4);
+  letter-spacing:.1em;text-transform:uppercase;
+  animation:lspin 1.4s linear infinite;flex-shrink:0;
+  position:relative;
+}
+.lcyl::before{content:'';position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(240,230,200,.07)}
+.lcyl::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:1px dashed rgba(240,230,200,.05);animation:lspinr 3s linear infinite}
+.lcyl:nth-child(1){animation-duration:1.6s}
+.lcyl:nth-child(2){animation-direction:reverse;animation-duration:.9s;border-color:rgba(192,57,43,.4);color:rgba(192,57,43,.6)}
+.lcyl:nth-child(2)::before{border-color:rgba(192,57,43,.12)}
+.lcyl:nth-child(3){animation-duration:2.1s}
+.lcyl:nth-child(4){animation-direction:reverse;animation-duration:1.2s;border-color:rgba(232,160,32,.3);color:rgba(232,160,32,.5)}
+.lcyl:nth-child(4)::before{border-color:rgba(232,160,32,.1)}
+.lpaper{width:2px;height:44px;background:linear-gradient(180deg,transparent,rgba(240,230,200,.18),transparent);margin:0 -1px}
+@keyframes lspin{to{transform:rotate(360deg)}}
+@keyframes lspinr{to{transform:rotate(-360deg)}}
+.lbar{width:200px;height:1px;background:rgba(240,230,200,.06);position:relative;overflow:hidden;margin-bottom:1.2rem;border-radius:1px}
+.lbar-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));width:0;animation:lfill 2.6s ease-in-out forwards}
+@keyframes lfill{0%{width:0}50%{width:55%}78%{width:84%}100%{width:100%}}
+.ltxt{font-family:var(--mn);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,230,200,.25)}
+
+/* ══ NAV — completamente ridisegnata ══ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  height:54px;
+  background:rgba(10,8,4,.88);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--rule);
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:stretch;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:12px;
+  padding:0 24px;border-right:1px solid var(--rule);
+}
+.nav-logo-circle{
+  width:26px;height:26px;border-radius:50%;
+  border:1.5px solid var(--red);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--bb);font-size:11px;color:var(--red);
+  transition:background .2s,color .2s;
+}
+.nav-logo:hover .nav-logo-circle{background:var(--red);color:#fff}
+.nav-logo-name{font-family:var(--bb);font-size:16px;letter-spacing:.08em;color:var(--ink);white-space:nowrap}
+.nav-logo-dot{width:4px;height:4px;border-radius:50%;background:var(--red);flex-shrink:0}
+
+.nav-center{display:flex;align-items:stretch;overflow:hidden;position:relative}
+.nav-scroll-area{display:flex;list-style:none;overflow-x:auto;scrollbar-width:none;align-items:stretch}
+.nav-scroll-area::-webkit-scrollbar{display:none}
+.nav-scroll-area a{
+  display:flex;align-items:center;padding:0 15px;
+  font-family:var(--mn);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink3);text-decoration:none;white-space:nowrap;
+  border-bottom:2px solid transparent;
+  transition:color .2s,border-color .2s;
+  position:relative;
+}
+.nav-scroll-area a::after{content:attr(data-n);position:absolute;top:10px;right:6px;font-size:7px;color:var(--ink3);opacity:.5}
+.nav-scroll-area a:hover,.nav-scroll-area a.active{color:var(--ink);border-bottom-color:var(--red)}
+.nav-fade-r{position:absolute;right:0;top:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,rgba(10,8,4,.88));pointer-events:none}
+
+.nav-right{
+  display:flex;align-items:center;gap:0;
+  border-left:1px solid var(--rule);
+}
+.nav-author-pill{
+  display:flex;align-items:center;gap:8px;padding:0 20px;height:100%;
+  border-right:1px solid var(--rule);
+}
+.nav-author-init{width:22px;height:22px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--bb);font-size:10px;color:#fff;flex-shrink:0}
+.nav-author-txt{font-family:var(--mn);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+.nav-prog-wrap{width:60px;display:flex;align-items:center;padding:0 16px}
+.nav-prog{width:100%;height:2px;background:var(--rule);border-radius:1px;position:relative;overflow:hidden}
+.nav-prog-fill{height:100%;background:var(--red);width:0;border-radius:1px;transition:width .1s}
+
+/* ══ HERO ══ */
+.hero{
+  min-height:100vh;background:var(--d);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:100px 0 80px;position:relative;overflow:hidden;
+}
+.hero-lines{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:72px 72px;
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(0,0,0,.25) 0%,transparent 100%);
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(0,0,0,.25) 0%,transparent 100%)}
+.hero-redline{position:absolute;top:0;left:60px;width:2px;height:100%;background:var(--red);opacity:.7}
+.hero-canvas{position:absolute;inset:0;pointer-events:none;z-index:1}
+.hero-inner{max-width:1120px;margin:0 auto;padding:0 80px 0 80px;position:relative;z-index:2}
+.hero-tag{
+  font-family:var(--mn);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);
+  display:flex;align-items:center;gap:10px;margin-bottom:2rem;
+  opacity:0;animation:rUp .6s .4s ease forwards;
+}
+.hero-tag::before{content:'';width:28px;height:1px;background:var(--red)}
+.hero-title-wrap{overflow:hidden;margin-bottom:1.25rem;opacity:0;animation:rUp .9s .6s ease forwards}
+/* ══ HERO TITLE LETTER GLOW ══ */
+.hero-title{font-family:var(--bb);font-size:clamp(72px,13vw,180px);line-height:.88;letter-spacing:.015em;color:var(--ink);display:block}
+.hero-title .red{color:var(--red)}
+.hero-title .outline{-webkit-text-stroke:1px rgba(240,230,200,.3);color:transparent}
+/* each span wrapping a letter */
+.ht-char{
+  display:inline-block;
+  transition:color .12s ease, text-shadow .12s ease, transform .15s cubic-bezier(.23,1,.32,1);
+  will-change:color,text-shadow,transform;
+  cursor:none;
+}
+.ht-char:hover{
+  transform:translateY(-4px) scale(1.05);
+}
+/* glow palettes per line */
+.ht-line-0 .ht-char:hover{color:var(--red);text-shadow:0 0 30px rgba(192,57,43,.8),0 0 60px rgba(192,57,43,.4),0 0 100px rgba(192,57,43,.2)}
+.ht-line-1 .ht-char:hover{color:var(--gold);text-shadow:0 0 30px rgba(232,160,32,.9),0 0 60px rgba(232,160,32,.5),0 0 100px rgba(232,160,32,.2)}
+.ht-line-2 .ht-char:hover{color:rgba(240,230,200,.6);text-shadow:0 0 30px rgba(240,230,200,.5),0 0 60px rgba(240,230,200,.2)}
+/* neighbour chars get partial glow via JS */
+.ht-char.near{
+  transform:translateY(-2px);
+}
+.ht-line-0 .ht-char.near{color:rgba(192,57,43,.5);text-shadow:0 0 20px rgba(192,57,43,.3)}
+.ht-line-1 .ht-char.near{color:rgba(232,160,32,.5);text-shadow:0 0 20px rgba(232,160,32,.3)}
+.ht-line-2 .ht-char.near{color:rgba(240,230,200,.4);text-shadow:0 0 20px rgba(240,230,200,.15)}
+.hero-sub{font-family:var(--pf);font-style:italic;font-size:clamp(16px,2.2vw,24px);color:var(--ink2);max-width:520px;line-height:1.55;opacity:0;animation:rUp .8s .9s ease forwards;margin-bottom:3rem}
+.hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:2rem;opacity:0;animation:rUp .7s 1.1s ease forwards}
+.hero-author-card{display:flex;align-items:center;gap:14px;border:1px solid var(--rules);padding:12px 20px}
+.hac-av{width:38px;height:38px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--bb);font-size:16px;color:#fff;flex-shrink:0}
+.hac-n{font-family:var(--bb);font-size:18px;letter-spacing:.06em;color:var(--ink);line-height:1}
+.hac-r{font-family:var(--mn);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-top:2px}
+.hero-scroll-hint{font-family:var(--mn);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);writing-mode:vertical-rl;display:flex;align-items:center;gap:10px}
+.hero-scroll-hint::after{content:'';width:1px;height:48px;background:var(--rules)}
+@keyframes rUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* magnetic text */
+.mag{display:inline-block;transition:transform .4s cubic-bezier(.23,1,.32,1)}
+
+
+/* ht-line display */
+.ht-line{display:block;line-height:.9}
+.ht-line-2{-webkit-text-stroke:1px rgba(240,230,200,.25);color:transparent}
+.ht-line-2 .ht-char:hover{color:transparent;-webkit-text-stroke:1px rgba(240,230,200,.6);text-shadow:0 0 30px rgba(240,230,200,.5),0 0 60px rgba(240,230,200,.2)}
+.ht-line-2 .ht-char.near{color:transparent;-webkit-text-stroke:1px rgba(240,230,200,.4)}
+
+
+.ht-line-0 .ht-char.far-near{color:rgba(192,57,43,.35);text-shadow:0 0 12px rgba(192,57,43,.2);transform:translateY(-1px)}
+.ht-line-1 .ht-char.far-near{color:rgba(232,160,32,.35);text-shadow:0 0 12px rgba(232,160,32,.2);transform:translateY(-1px)}
+.ht-line-2 .ht-char.far-near{color:rgba(240,230,200,.3);text-shadow:0 0 12px rgba(240,230,200,.1);transform:translateY(-1px)}
+/* ══ FLOW BAR ══ */
+.fbar{background:var(--dw);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:1rem 80px;overflow-x:auto;scrollbar-width:none}
+.fbar::-webkit-scrollbar{display:none}
+.fbar-inner{display:flex;align-items:center;max-width:1120px;margin:0 auto}
+.fst{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.fsn{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:9px;flex-shrink:0}
+.fa{background:var(--red);color:#fff}.fb{background:var(--blue);color:#fff}.fc{background:var(--teal);color:#fff}.fd{background:var(--gold);color:#0d0a06}
+.fsl{font-family:var(--mn);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.fsep{flex:1;min-width:16px;height:1px;background:var(--rule);margin:0 6px;position:relative}
+.fsep::after{content:'›';position:absolute;right:-5px;top:-8px;font-size:10px;color:var(--rule)}
+
+/* ══ SECTIONS ══ */
+.sec{scroll-margin-top:54px}
+.sd{background:var(--d)}.sw{background:var(--dw)}.sm{background:var(--dm)}
+.si{max-width:1120px;margin:0 auto;padding:5.5rem 80px;position:relative}
+.sh{display:flex;align-items:flex-start;gap:2rem;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--rule);position:relative}
+.sh::after{content:'';position:absolute;bottom:-1px;left:0;width:56px;height:2px;background:var(--red)}
+.sh-num{font-family:var(--bb);font-size:clamp(80px,10vw,120px);line-height:1;color:rgba(240,230,200,.05);flex-shrink:0;margin-top:-8px;user-select:none}
+.sh-r{flex:1}
+.sh-tag{font-family:var(--mn);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:.6rem;display:flex;align-items:center;gap:8px}
+.sh-tag::before{content:'';width:18px;height:1px;background:var(--red)}
+.sh-h2{font-family:var(--pf);font-size:clamp(26px,3.8vw,44px);font-weight:900;line-height:1.1;letter-spacing:-.01em}
+.sh-h2 em{font-style:italic;color:var(--red)}
+.sp{font-size:16px;color:var(--ink2);line-height:1.85;margin-bottom:.9rem}
+.sp strong{color:var(--ink);font-weight:600}
+.sh3{font-family:var(--mn);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(240,230,200,.35);margin:1.8rem 0 .75rem;display:flex;align-items:center;gap:10px}
+.sh3::after{content:'';flex:1;height:1px;background:var(--rule)}
+
+/* ══ LISTS ══ */
+.slist{list-style:none;margin:.4rem 0 1.2rem}
+.slist li{display:flex;gap:12px;padding:7px 0;font-size:15px;color:var(--ink2);line-height:1.68;border-bottom:1px solid var(--rule)}
+.slist li:last-child{border-bottom:none}
+.slist li::before{content:'—';color:var(--red);font-family:var(--mn);flex-shrink:0;font-size:12px;margin-top:3px}
+.slist li strong{color:var(--ink);font-weight:600}
+
+/* ══ CALLOUTS ══ */
+.cal{border-left:3px solid;padding:1.25rem 1.5rem;margin:1.5rem 0;border-radius:0 3px 3px 0;position:relative;overflow:hidden}
+.cal::before{content:'';position:absolute;top:0;right:0;width:35%;height:100%;background:linear-gradient(90deg,transparent,rgba(240,230,200,.015))}
+.cal-lbl{font-family:var(--mn);font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.45rem;opacity:.75}
+.cal-p{font-size:15px;line-height:1.7}
+.cr2{border-color:var(--red);background:rgba(192,57,43,.05)}.cr2 .cal-lbl{color:var(--red)}.cr2 .cal-p{color:rgba(240,195,190,.8)}
+.cg2{border-color:var(--gold);background:rgba(232,160,32,.05)}.cg2 .cal-lbl{color:var(--gold)}.cg2 .cal-p{color:rgba(240,225,185,.8)}
+.ct2{border-color:var(--teal);background:rgba(45,125,110,.05)}.ct2 .cal-lbl{color:#4ec9b0}.ct2 .cal-p{color:rgba(195,240,230,.75)}
+.cb2{border-color:var(--blue);background:rgba(44,74,138,.07)}.cb2 .cal-lbl{color:#6a9ae8}.cb2 .cal-p{color:rgba(195,215,245,.75)}
+
+/* ══ CARDS ══ */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin:1.5rem 0}
+.ci{background:var(--d);padding:1.5rem 1.25rem;transition:background .3s;position:relative;overflow:hidden}
+.sw .ci{background:var(--dw)}.sm .ci{background:var(--dm)}
+.ci::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--red);transition:width .4s ease}
+.ci:hover{background:rgba(240,230,200,.03)}.ci:hover::after{width:100%}
+.ci-icon{font-size:18px;margin-bottom:.65rem;line-height:1}
+.ci-h{font-family:var(--pf);font-size:14px;font-weight:700;margin-bottom:.3rem;color:var(--ink)}
+.ci-p{font-size:12px;color:var(--ink2);line-height:1.6}
+
+/* ══ TABLE ══ */
+.stab{width:100%;border-collapse:collapse;font-size:13.5px;margin:1.5rem 0;border:1px solid var(--rule)}
+.stab thead{background:rgba(240,230,200,.03)}
+.stab th{font-family:var(--mn);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:rgba(240,230,200,.38);padding:11px 16px;text-align:left;border-bottom:1px solid var(--rule)}
+.stab td{padding:11px 16px;color:var(--ink2);border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.55}
+.stab tr:last-child td{border-bottom:none}
+.stab tbody tr:hover{background:rgba(240,230,200,.025)}
+.stab td:first-child{font-family:var(--mn);font-size:12px;color:var(--ink)}
+
+/* ══ CMYK ══ */
+.cmyk{display:flex;height:52px;border-radius:2px;overflow:hidden;margin:1.5rem 0;border:1px solid rgba(255,255,255,.04)}
+.cmyk div{flex:1;display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:11px;font-weight:500;letter-spacing:.1em;transition:flex .5s cubic-bezier(.23,1,.32,1),opacity .3s;position:relative;overflow:hidden}
+.cmyk div::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .3s}
+.cmyk div:hover{flex:2.5}.cmyk div:hover::after{background:rgba(255,255,255,.08)}
+.cmyk-c{background:#005b8e;color:rgba(255,255,255,.8)}
+.cmyk-m{background:#9e1b5e;color:rgba(255,255,255,.8)}
+.cmyk-y{background:#c8a800;color:rgba(20,18,0,.75)}
+.cmyk-k{background:#1c1810;color:rgba(240,230,200,.55);border-left:1px solid rgba(255,255,255,.05)}
+
+/* ══ FLOW DIAGRAM ══ */
+.fdiag{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:1.5rem 0;background:rgba(240,230,200,.015);border:1px solid var(--rule);padding:1.25rem 1.5rem;border-radius:3px}
+.fd-b{padding:7px 14px;font-family:var(--mn);font-size:11px;letter-spacing:.04em;border-radius:2px;border:1px solid transparent;flex-shrink:0;transition:transform .2s}
+.fd-b:hover{transform:translateY(-2px)}
+.fd-a{font-size:12px;color:var(--rules);flex-shrink:0}
+.fdb-r{background:rgba(192,57,43,.12);border-color:rgba(192,57,43,.35);color:#e8908a}
+.fdb-b{background:rgba(44,74,138,.12);border-color:rgba(44,74,138,.35);color:#8aafe8}
+.fdb-g{background:rgba(232,160,32,.08);border-color:rgba(232,160,32,.28);color:#e8c88a}
+.fdb-t{background:rgba(45,125,110,.1);border-color:rgba(45,125,110,.3);color:#8ae8d8}
+.fdb-n{background:rgba(240,230,200,.04);border-color:var(--rule);color:var(--ink2)}
+
+/* ══ OFFSET MACHINE ══ */
+.omach{background:rgba(240,230,200,.018);border:1px solid var(--rule);border-radius:3px;padding:2rem;margin:1.5rem 0;position:relative;overflow:hidden}
+.omach::before{content:'OFFSET';position:absolute;right:.5rem;top:50%;transform:translateY(-50%);font-family:var(--bb);font-size:96px;color:rgba(240,230,200,.02);pointer-events:none;user-select:none}
+.om-lbl{font-family:var(--mn);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(240,230,200,.28);margin-bottom:1.5rem}
+.cyls{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.cunit{display:flex;flex-direction:column;align-items:center;gap:10px}
+.cyl{width:88px;height:88px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:9.5px;letter-spacing:.04em;text-align:center;line-height:1.45;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s;position:relative}
+.cyl::before{content:'';position:absolute;inset:7px;border-radius:50%;border:1px solid rgba(255,255,255,.07)}
+.cyl:hover,.cyl.act{transform:scale(1.1) rotate(6deg)}
+.c-l{background:rgba(44,74,138,.18);border-color:rgba(44,74,138,.65);color:#8aafe8}
+.c-l.act{box-shadow:0 0 28px rgba(44,74,138,.45)}
+.c-c{background:rgba(192,57,43,.14);border-color:rgba(192,57,43,.6);color:#e8908a}
+.c-c.act{box-shadow:0 0 28px rgba(192,57,43,.45)}
+.c-p{background:rgba(45,125,110,.13);border-color:rgba(45,125,110,.55);color:#8ae8d8}
+.c-p.act{box-shadow:0 0 28px rgba(45,125,110,.45)}
+.cconn{display:flex;align-items:center;margin:0 8px;padding-bottom:38px}
+.cdots{display:flex;gap:3px}.cdot{width:4px;height:4px;border-radius:50%;background:var(--rules)}
+.cnl{font-family:var(--mn);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,230,200,.3);text-align:center;max-width:96px}
+.minfo{margin-top:1.5rem;background:rgba(240,230,200,.025);border:1px solid var(--rule);border-radius:2px;padding:1rem 1.25rem;min-height:68px;font-size:15px;color:var(--ink2);line-height:1.7;transition:opacity .25s}
+.minfo-t{font-family:var(--pf);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:.3rem}
+
+/* ══ PAPER SELECTOR ══ */
+.prow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.5rem 0}
+.popt{border:1px solid var(--rule);border-radius:3px;padding:1.25rem;transition:border-color .25s,background .25s;position:relative;overflow:hidden}
+.popt::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--red);transition:width .4s}
+.popt:hover::after,.popt.sel::after{width:100%}
+.popt.sel{border-color:rgba(192,57,43,.5)}
+.popt:hover{background:rgba(240,230,200,.025)}
+.psw{width:100%;height:52px;border-radius:2px;margin-bottom:.75rem;border:1px solid rgba(255,255,255,.07);position:relative;overflow:hidden}
+.psg{background:linear-gradient(135deg,#d0c8b8 0%,#e8e0d0 35%,#f5f0e8 50%,#e0d8c8 75%,#c8c0b0 100%)}
+.pss{background:linear-gradient(120deg,#c8c4bc 0%,#d8d4cc 50%,#c0bcb4 100%)}
+.psm{background:#b8b4ae}
+.ph{font-family:var(--pf);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:.2rem}
+.psub{font-family:var(--mn);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
+.pdesc{background:rgba(240,230,200,.025);border:1px solid var(--rule);border-radius:3px;padding:1rem 1.25rem;font-size:15px;color:var(--ink2);line-height:1.7;min-height:60px;transition:opacity .2s}
+.pdesc strong{color:var(--ink)}
+
+/* ══ SEGNATURA ══ */
+.segvis{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:2rem;background:rgba(240,230,200,.015);border:1px solid var(--rule);border-radius:3px;margin:1.5rem 0}
+.sfog{width:256px;height:176px;border:1px solid var(--rules);position:relative;display:grid;grid-template-columns:1fr 1fr;background:rgba(240,230,200,.025)}
+.sfog::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;border-left:1px dashed rgba(240,230,200,.18)}
+.sfog::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(240,230,200,.12);z-index:1}
+.sfp{display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:15px;font-weight:500;color:var(--ink3)}
+.sfp.r{color:var(--red)}
+.sfold{font-family:var(--mn);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(240,230,200,.22);display:flex;align-items:center;gap:8px}
+.sfold::before,.sfold::after{content:'';flex:1;height:1px;background:var(--rule)}
+.spages{display:flex;gap:2px}
+.sbp{width:50px;height:68px;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:12px;font-weight:500;color:var(--ink2);background:rgba(240,230,200,.015)}
+.sbp.sl{border-left:3px solid var(--rules)}.sbp.sr{border-right:3px solid var(--rules)}
+.sbp.r{color:var(--red)}
+.scap{font-family:var(--mn);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,230,200,.22);text-align:center}
+
+/* ══ TIMELINE ══ */
+.tl{margin:1.5rem 0}
+.tli{display:flex;gap:18px}
+.tll{display:flex;flex-direction:column;align-items:center;width:18px;flex-shrink:0;padding-top:3px}
+.tld{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tlln{flex:1;width:1px;background:var(--rule);min-height:14px;margin:4px 0}
+.tlb{padding-bottom:1.4rem;flex:1}
+.tlh{font-family:var(--pf);font-size:15px;font-weight:700;margin-bottom:.2rem;color:var(--ink)}
+.tlp{font-size:13px;color:var(--ink2);line-height:1.6}
+.dr{background:var(--red)}.dg{background:var(--gold)}.dt{background:var(--teal)}.db{background:var(--blue)}.dn{background:rgba(240,230,200,.22)}
+
+/* ══ BIG QUOTE ══ */
+.bq{border-left:3px solid var(--red);padding:1.5rem 2rem;margin:2rem 0;position:relative}
+.bq-t{font-family:var(--pf);font-style:italic;font-size:clamp(17px,2.2vw,24px);line-height:1.55;color:var(--ink2)}
+.bq-m{font-family:var(--bb);font-size:72px;color:rgba(192,57,43,.12);line-height:1;position:absolute;top:-6px;left:2rem}
+
+/* ══ CONCLUSIONE ══ */
+.cong{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);overflow:hidden;border-radius:3px;margin:1.5rem 0}
+.conc{background:var(--d);padding:1.4rem 1.1rem;transition:background .3s}
+.conc:hover{background:rgba(240,230,200,.028)}
+.con-n{font-family:var(--bb);font-size:44px;color:rgba(240,230,200,.08);line-height:1;margin-bottom:.4rem}
+.con-h{font-family:var(--mn);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink);margin-bottom:.25rem}
+.con-p{font-size:11.5px;color:var(--ink2);line-height:1.5}
+
+/* ══ ★ PREVENTIVO ══ */
+.prev-wrap{background:rgba(240,230,200,.018);border:1px solid var(--rule);border-radius:4px;padding:2rem;margin:1.5rem 0}
+.prev-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.prev-col{}
+.pfield{margin-bottom:1.2rem}
+.pfield label{font-family:var(--mn);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(240,230,200,.38);display:block;margin-bottom:.45rem}
+.pinput,.pselect{
+  width:100%;background:rgba(240,230,200,.04);border:1px solid var(--rule);border-radius:2px;
+  padding:9px 12px;font-family:var(--cr);font-size:15px;color:var(--ink);
+  outline:none;transition:border-color .2s,background .2s;appearance:none;
+}
+.pinput:focus,.pselect:focus{border-color:rgba(192,57,43,.5);background:rgba(240,230,200,.06)}
+.prange{width:100%;appearance:none;height:2px;background:var(--rule);outline:none;border-radius:1px;margin:8px 0}
+.prange::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:var(--red);cursor:none;transition:transform .2s}
+.prange::-webkit-slider-thumb:hover{transform:scale(1.3)}
+.prange-val{font-family:var(--mn);font-size:11px;color:var(--red);display:block;margin-top:.2rem;text-align:right}
+.pcheck-group{display:flex;flex-direction:column;gap:.5rem}
+.pcheck{display:flex;align-items:center;gap:10px;font-family:var(--cr);font-size:14px;color:var(--ink2)}
+.pcheck input[type=checkbox]{appearance:none;width:14px;height:14px;border:1px solid var(--rules);border-radius:2px;flex-shrink:0;position:relative;background:transparent;transition:background .2s,border-color .2s}
+.pcheck input[type=checkbox]:checked{background:var(--red);border-color:var(--red)}
+.pcheck input[type=checkbox]:checked::after{content:'✓';position:absolute;top:-1px;left:2px;font-size:11px;color:#fff;font-weight:bold}
+.pbtn{
+  width:100%;margin-top:1.5rem;padding:14px;
+  font-family:var(--bb);font-size:18px;letter-spacing:.1em;
+  background:var(--red);color:#fff;border:none;border-radius:2px;
+  transition:background .2s,transform .15s;
+}
+.pbtn:hover{background:#a0321e;transform:translateY(-1px)}
+.pbtn:active{transform:translateY(0)}
+.prev-out{margin-top:1.5rem;display:none}
+.prev-out.show{display:block}
+.prev-result{background:rgba(240,230,200,.03);border:1px solid var(--rules);border-radius:3px;padding:1.5rem;position:relative;overflow:hidden}
+.prev-result::before{content:'PREVENTIVO';position:absolute;right:0;top:50%;transform:translateY(-50%);font-family:var(--bb);font-size:80px;color:rgba(240,230,200,.025);pointer-events:none}
+.pr-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
+.pr-title{font-family:var(--bb);font-size:28px;letter-spacing:.06em;color:var(--ink)}
+.pr-date{font-family:var(--mn);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.pr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:2px;overflow:hidden;margin-bottom:1.25rem}
+.pr-cell{background:var(--d);padding:.875rem 1rem}
+.sw .pr-cell,.sm .pr-cell{background:var(--dm)}
+.pr-cell-l{font-family:var(--mn);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:.25rem}
+.pr-cell-v{font-family:var(--pf);font-size:16px;font-weight:700;color:var(--ink)}
+.pr-price{display:flex;align-items:baseline;gap:8px;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.pr-p-lbl{font-family:var(--mn);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.pr-p-val{font-family:var(--bb);font-size:36px;color:var(--red);letter-spacing:.04em;line-height:1}
+.pr-p-note{font-family:var(--cr);font-style:italic;font-size:13px;color:var(--ink3);margin-left:auto;align-self:flex-end}
+.pr-notes{margin-top:1rem;font-size:13px;color:var(--ink3);line-height:1.65;font-style:italic}
+
+/* ══ ANIMATED SVG ELEMENTS (scroll-triggered) ══ */
+.anim-el{position:absolute;pointer-events:none;opacity:0;transition:opacity .8s,transform .8s}
+.anim-el.vis{opacity:1;transform:none!important}
+
+/* ══ SCROLL DECORATIVES ══ */
+.sec-deco{position:absolute;right:0;top:50%;transform:translateY(-50%);pointer-events:none;z-index:0;opacity:0;transition:opacity 1s .3s,transform 1s .3s ease;transform:translateY(-50%) translateX(30px)}
+.sec.in-view .sec-deco{opacity:1;transform:translateY(-50%) translateX(0)}
+
+/* ══ FLOATING PARTICLES CANVAS ══ */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4}
+
+/* ══ AUTHOR ══ */
+.auth-sec{background:var(--red);padding:5rem 80px;position:relative;overflow:hidden}
+.auth-sec::before{content:'GA';font-family:var(--bb);font-size:280px;position:absolute;right:-20px;top:50%;transform:translateY(-50%);color:rgba(0,0,0,.1);pointer-events:none;user-select:none;line-height:1}
+.auth-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:3rem;flex-wrap:wrap;position:relative}
+.auth-av{width:76px;height:76px;border-radius:50%;background:rgba(0,0,0,.18);border:2px solid rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;font-family:var(--bb);font-size:32px;color:#fff;flex-shrink:0}
+.auth-t h2{font-family:var(--pf);font-size:clamp(22px,3.5vw,38px);font-weight:900;color:#fff;margin-bottom:.2rem}
+.auth-t p{font-size:15px;color:rgba(255,255,255,.65);font-style:italic}
+.auth-meta{display:flex;gap:2rem;flex-wrap:wrap}
+.am-item{display:flex;flex-direction:column;gap:2px}
+.am-l{font-family:var(--mn);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.am-v{font-family:var(--mn);font-size:12px;color:rgba(255,255,255,.88)}
+
+/* ══ FOOTER ══ */
+.footer{background:#080604;border-top:1px solid var(--rule);padding:1.75rem 80px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.ft-l{font-family:var(--mn);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,230,200,.18)}
+.ft-r{font-family:var(--mn);font-size:9px;color:rgba(240,230,200,.18)}
+.ft-r span{color:var(--red)}
+
+/* ══ REVEAL ══ */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.rv.vis{opacity:1;transform:none}
+.rv2{opacity:0;transform:translateX(-24px);transition:opacity .7s ease,transform .7s ease}
+.rv2.vis{opacity:1;transform:none}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:768px){
+  .si,.hero-inner,.fbar{padding-left:1.5rem;padding-right:1.5rem}
+  .prev-grid{grid-template-columns:1fr}
+  .cong{grid-template-columns:repeat(2,1fr)}
+  .prow{grid-template-columns:1fr}
+  .auth-sec,.footer{padding-left:1.5rem;padding-right:1.5rem}
+  .cyl{width:70px;height:70px}
+}
+@media print{#LD,.nav,#CUR,#particles{display:none}.rv,.rv2{opacity:1;transform:none}}
+
+/* ══ ANIMATIONS LAYER ══ */
+
+/* ── Scanline sweep on section headers ── */
+@keyframes scanline {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+.sh::before {
+  content:''; position:absolute; top:0; left:0; height:2px; width:25%;
+  background:linear-gradient(90deg,transparent,rgba(192,57,43,.6),transparent);
+  animation:scanline 3s ease-in-out infinite;
+  pointer-events:none;
+}
+
+/* ── Big number count-up flash ── */
+@keyframes numFlash {
+  0%   { color:rgba(240,230,200,.05); }
+  50%  { color:rgba(192,57,43,.18); }
+  100% { color:rgba(240,230,200,.05); }
+}
+.sh-num.flash { animation:numFlash .6s ease forwards; }
+
+/* ── Section header accent line grow ── */
+.sh::after { width:0; transition:width .8s .2s cubic-bezier(.23,1,.32,1); }
+.sh.line-grown::after { width:56px; }
+
+/* ── Word reveal on h2 ── */
+.wr-word {
+  display:inline-block;
+  opacity:0; transform:translateY(16px);
+  transition:opacity .5s ease, transform .5s ease;
+}
+.wr-word.in { opacity:1; transform:none; }
+
+/* ── List item stagger ── */
+.slist li {
+  opacity:0; transform:translateX(-12px);
+  transition:opacity .45s ease, transform .45s ease;
+}
+.slist.revealed li { opacity:1; transform:none; }
+.slist.revealed li:nth-child(1){transition-delay:.03s}
+.slist.revealed li:nth-child(2){transition-delay:.09s}
+.slist.revealed li:nth-child(3){transition-delay:.15s}
+.slist.revealed li:nth-child(4){transition-delay:.21s}
+.slist.revealed li:nth-child(5){transition-delay:.27s}
+.slist.revealed li:nth-child(6){transition-delay:.33s}
+.slist.revealed li:nth-child(7){transition-delay:.39s}
+
+/* ── Card 3D tilt ── */
+.ci { transform-style:preserve-3d; }
+
+/* ── Callout slide-in ── */
+.cal {
+  opacity:0; transform:translateX(-20px);
+  transition:opacity .6s ease, transform .6s ease, border-color .3s;
+}
+.cal.cal-in { opacity:1; transform:none; }
+
+/* ── Table row stagger ── */
+.stab tbody tr {
+  opacity:0; transform:translateY(8px);
+  transition:opacity .4s ease, transform .4s ease, background .2s;
+}
+.stab.revealed tbody tr { opacity:1; transform:none; }
+.stab.revealed tbody tr:nth-child(1){transition-delay:.05s}
+.stab.revealed tbody tr:nth-child(2){transition-delay:.12s}
+.stab.revealed tbody tr:nth-child(3){transition-delay:.19s}
+.stab.revealed tbody tr:nth-child(4){transition-delay:.26s}
+.stab.revealed tbody tr:nth-child(5){transition-delay:.33s}
+
+/* ── Paragraph word shimmer on hover ── */
+.sp {
+  background:linear-gradient(120deg,var(--ink2) 0%,var(--ink2) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  transition:none;
+}
+.sp strong { -webkit-text-fill-color:var(--ink); }
+
+/* ── Hero red line pulse ── */
+@keyframes redLinePulse {
+  0%,100% { opacity:.7; width:2px; }
+  50%      { opacity:1; width:3px; box-shadow:0 0 12px rgba(192,57,43,.6); }
+}
+.hero-redline { animation:redLinePulse 3s ease-in-out infinite; }
+
+/* ── Cursor trail canvas ── */
+#ctrail { position:fixed; inset:0; pointer-events:none; z-index:99990; }
+
+/* ── CMYK bar animated on enter ── */
+.cmyk div {
+  opacity:0; transform:scaleY(0);
+  transform-origin:bottom;
+  transition:flex .5s cubic-bezier(.23,1,.32,1), opacity .4s ease, transform .5s ease;
+}
+.cmyk.revealed div { opacity:1; transform:scaleY(1); }
+.cmyk.revealed div:nth-child(1){transition-delay:.05s}
+.cmyk.revealed div:nth-child(2){transition-delay:.12s}
+.cmyk.revealed div:nth-child(3){transition-delay:.19s}
+.cmyk.revealed div:nth-child(4){transition-delay:.26s}
+
+/* ── Flow diagram boxes pop ── */
+.fdiag .fd-b {
+  opacity:0; transform:scale(.85);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s ease, border-color .3s;
+}
+.fdiag.revealed .fd-b { opacity:1; transform:scale(1); }
+.fdiag.revealed .fd-b:nth-child(1){transition-delay:.0s}
+.fdiag.revealed .fd-b:nth-child(2){transition-delay:.07s}
+.fdiag.revealed .fd-b:nth-child(3){transition-delay:.12s}
+.fdiag.revealed .fd-b:nth-child(4){transition-delay:.17s}
+.fdiag.revealed .fd-b:nth-child(5){transition-delay:.22s}
+.fdiag.revealed .fd-b:nth-child(6){transition-delay:.27s}
+.fdiag.revealed .fd-b:nth-child(7){transition-delay:.32s}
+.fdiag.revealed .fd-b:nth-child(8){transition-delay:.37s}
+.fdiag.revealed .fd-b:nth-child(9){transition-delay:.42s}
+
+/* ── Timeline items animate in ── */
+.tli {
+  opacity:0; transform:translateY(16px);
+  transition:opacity .5s ease, transform .5s ease;
+}
+.tl.revealed .tli { opacity:1; transform:none; }
+.tl.revealed .tli:nth-child(1){transition-delay:.05s}
+.tl.revealed .tli:nth-child(2){transition-delay:.15s}
+.tl.revealed .tli:nth-child(3){transition-delay:.25s}
+.tl.revealed .tli:nth-child(4){transition-delay:.35s}
+.tl.revealed .tli:nth-child(5){transition-delay:.45s}
+
+/* ── Timeline dot ping ── */
+@keyframes dotPing {
+  0%   { box-shadow: 0 0 0 0 rgba(192,57,43,.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(192,57,43,0); }
+  100% { box-shadow: 0 0 0 0 rgba(192,57,43,0); }
+}
+.tl.revealed .tld { animation:dotPing 1.4s ease-out forwards; }
+.tl.revealed .tli:nth-child(1) .tld{animation-delay:.1s}
+.tl.revealed .tli:nth-child(2) .tld{animation-delay:.2s}
+.tl.revealed .tli:nth-child(3) .tld{animation-delay:.3s}
+.tl.revealed .tli:nth-child(4) .tld{animation-delay:.4s}
+.tl.revealed .tli:nth-child(5) .tld{animation-delay:.5s}
+
+/* ── Cylinders spin on idle ── */
+@keyframes cylSpin {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+.cyl-inner-ring {
+  position:absolute; inset:7px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.07);
+  animation:cylSpin 4s linear infinite;
+}
+.c-l .cyl-inner-ring { border-color:rgba(44,74,138,.15); animation-duration:5s; }
+.c-c .cyl-inner-ring { border-color:rgba(192,57,43,.12); animation-direction:reverse; animation-duration:3.5s; }
+.c-p .cyl-inner-ring { border-color:rgba(45,125,110,.12); animation-duration:6s; }
+
+/* ── Conclusion cells pop ── */
+.conc {
+  opacity:0; transform:translateY(20px) scale(.97);
+  transition:opacity .5s ease, transform .5s cubic-bezier(.23,1,.32,1), background .3s;
+}
+.cong.revealed .conc { opacity:1; transform:none; }
+.cong.revealed .conc:nth-child(1){transition-delay:.0s}
+.cong.revealed .conc:nth-child(2){transition-delay:.08s}
+.cong.revealed .conc:nth-child(3){transition-delay:.16s}
+.cong.revealed .conc:nth-child(4){transition-delay:.24s}
+.cong.revealed .conc:nth-child(5){transition-delay:.32s}
+
+/* ── Section bg parallax strip ── */
+.sec-parallax-line {
+  position:absolute; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(192,57,43,.15),transparent);
+  pointer-events:none;
+  will-change:transform;
+}
+
+/* ── Cards grid animate ── */
+.ci {
+  opacity:0; transform:translateY(14px);
+  transition:opacity .45s ease, transform .45s ease, background .3s;
+}
+.cgrid.revealed .ci { opacity:1; transform:none; }
+.cgrid.revealed .ci:nth-child(1){transition-delay:.0s}
+.cgrid.revealed .ci:nth-child(2){transition-delay:.08s}
+.cgrid.revealed .ci:nth-child(3){transition-delay:.16s}
+.cgrid.revealed .ci:nth-child(4){transition-delay:.24s}
+
+/* ── Number counter ── */
+.counter-num { display:inline; }
+
+/* ── Scroll indicator (hero) ── */
+@keyframes scrollBounce {
+  0%,100% { transform:translateY(0); opacity:.3; }
+  50%      { transform:translateY(6px); opacity:.7; }
+}
+.hero-scroll-hint { animation:scrollBounce 2s ease-in-out infinite; }
+
+/* ── Sh3 line grow ── */
+.sh3::after { width:0; transition:width 1s .1s ease; flex:0; }
+.sh3.line-grown::after { flex:1; }
+
+/* ── Author section entrance ── */
+.auth-inner > * {
+  opacity:0; transform:translateY(20px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.auth-inner.revealed > *:nth-child(1){opacity:1;transform:none;transition-delay:.05s}
+.auth-inner.revealed > *:nth-child(2){opacity:1;transform:none;transition-delay:.15s}
+.auth-inner.revealed > *:nth-child(3){opacity:1;transform:none;transition-delay:.25s}
+
+/* ── Paper opts animate ── */
+.popt {
+  opacity:0; transform:translateY(12px);
+  transition:opacity .4s ease, transform .4s ease, border-color .25s, background .25s;
+}
+.prow.revealed .popt { opacity:1; transform:none; }
+.prow.revealed .popt:nth-child(1){transition-delay:.0s}
+.prow.revealed .popt:nth-child(2){transition-delay:.1s}
+.prow.revealed .popt:nth-child(3){transition-delay:.2s}
+
+</style>
+</head>
+<body>
+
+<!-- ★ CURSOR TRAIL -->
+<canvas id="ctrail"></canvas>
+
+<!-- ★ CURSOR -->
+<div id="CUR"><div id="ci"></div><div id="cd"></div><div id="cr"></div></div>
+
+<!-- ★ LOADER -->
+<div id="LD">
+  <div class="lt">IL PROCESSO<br>DI STAMPA</div>
+  <div class="ls">di Gabriele Alari</div>
+  <div class="lcyls">
+    <div class="lcyl">Lastra</div><div class="lpaper"></div>
+    <div class="lcyl">Caucciù</div><div class="lpaper"></div>
+    <div class="lcyl">Press.</div><div class="lpaper"></div>
+    <div class="lcyl">Carta</div>
+  </div>
+  <div class="lbar"><div class="lbar-fill"></div></div>
+  <div class="ltxt">Preparazione in corso...</div>
+</div>
+
+<!-- ★ FLOATING PARTICLES -->
+<canvas id="particles"></canvas>
+
+<!-- ★ NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-circle">PS</div>
+    <div class="nav-logo-dot"></div>
+    <span class="nav-logo-name">Processo di Stampa</span>
+  </div>
+  <div class="nav-center">
+    <ul class="nav-scroll-area" id="navlinks">
+      <li><a href="#h-intro" data-n="01">Intro</a></li>
+      <li><a href="#s-prev" data-n="02">Preventivo</a></li>
+      <li><a href="#s-bozze" data-n="03">Bozze</a></li>
+      <li><a href="#s-prove" data-n="04">Prove colore</a></li>
+      <li><a href="#s-col" data-n="06">Colore</a></li>
+      <li><a href="#s-carta" data-n="07">Carta</a></li>
+      <li><a href="#s-fog" data-n="08">Foglio</a></li>
+      <li><a href="#s-seg" data-n="09">Segnature</a></li>
+      <li><a href="#s-off" data-n="10">Offset</a></li>
+      <li><a href="#s-post" data-n="12">Post-stampa</a></li>
+      <li><a href="#s-calcprev" data-n="★">Preventivo</a></li>
+      <li><a href="#s-conc" data-n="14">Conclusione</a></li>
+    </ul>
+    <div class="nav-fade-r"></div>
+  </div>
+  <div class="nav-right">
+
+    <div class="nav-prog-wrap">
+      <div class="nav-prog"><div class="nav-prog-fill" id="npf"></div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ★ HERO -->
+<header class="hero" id="h-intro">
+  <canvas class="hero-canvas" id="hc"></canvas>
+  <div class="hero-lines"></div>
+  <div class="hero-redline"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">Organizzazione dei processi produttivi</div>
+    <div class="hero-title-wrap">
+      <div class="hero-title" id="hero-title">
+        <div class="ht-line ht-line-0" id="htl0"></div>
+        <div class="ht-line ht-line-1" id="htl1"></div>
+        <div class="ht-line ht-line-2" id="htl2"></div>
+      </div>
+    </div>
+    <p class="hero-sub mag" id="mt4">Dalla progettazione alla finitura: ogni fase che trasforma un file digitale in un oggetto stampato.</p>
+    <div class="hero-bottom">
+      <div class="hero-scroll-hint">Scorri per scoprire</div>
+    </div>
+  </div>
+</header>
+
+<!-- FLOW BAR -->
+<div class="fbar">
+  <div class="fbar-inner">
+    <div class="fst"><div class="fsn fa">1–3</div><span class="fsl">Progettazione</span></div>
+    <div class="fsep"></div>
+    <div class="fst"><div class="fsn fb">4–5</div><span class="fsl">Prove</span></div>
+    <div class="fsep"></div>
+    <div class="fst"><div class="fsn fc">6–7</div><span class="fsl">Colore &amp; Carta</span></div>
+    <div class="fsep"></div>
+    <div class="fst"><div class="fsn fa">8–9</div><span class="fsl">Produzione</span></div>
+    <div class="fsep"></div>
+    <div class="fst"><div class="fsn fd">10–11</div><span class="fsl">Stampa Offset</span></div>
+    <div class="fsep"></div>
+    <div class="fst"><div class="fsn fb">12–14</div><span class="fsl">Finitura</span></div>
+  </div>
+</div>
+
+<!-- ══════ 01 INTRO ══════ -->
+<section class="sec sd" id="s-intro" style="position:relative;overflow:hidden">
+  <!-- Decorative SVG: rotating print wheel -->
+<div class="si">
+    <div class="sh rv">
+      <div class="sh-num">01</div>
+      <div class="sh-r"><div class="sh-tag">Sezione uno</div><h2 class="sh-h2">Introduzione al<br><em>processo di stampa</em></h2></div>
+    </div>
+    <p class="sp rv" style="transition-delay:.1s">Il <strong>processo di stampa</strong> è l'insieme di fasi tecniche e organizzative che trasformano un progetto grafico digitale in un prodotto fisico. Comprendere questo processo è fondamentale per chi lavora nella comunicazione visiva.</p>
+    <p class="sp rv" style="transition-delay:.15s">Ogni fase è interconnessa: un errore nella preparazione dei file può compromettere l'intera produzione. Il grafico deve conoscere non solo il software, ma anche le specifiche tecniche della stampa.</p>
+    <div class="cgrid rv" style="transition-delay:.2s">
+      <div class="ci"><div class="ci-icon">📐</div><div class="ci-h">Progettazione</div><div class="ci-p">Preventivo, formati, materiali, specifiche tecniche</div></div>
+      <div class="ci"><div class="ci-icon">🔬</div><div class="ci-h">Prove</div><div class="ci-p">Bozze non contrattuali e prove colore firmate</div></div>
+      <div class="ci"><div class="ci-icon">🖨</div><div class="ci-h">Stampa</div><div class="ci-p">Offset litografico, foglio macchina, segnature</div></div>
+      <div class="ci"><div class="ci-icon">✂️</div><div class="ci-h">Finitura</div><div class="ci-p">Legatoria, plastificazione, taglio finale</div></div>
+    </div>
+    <div class="cal cb2 rv" style="transition-delay:.25s">
+      <div class="cal-lbl">Perché è importante</div>
+      <p class="cal-p">Un grafico che conosce il processo di stampa produce file corretti al primo tentativo, risparmia tempo e denaro, e ottiene risultati prevedibili e di qualità superiore.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ 02 PREVENTIVO ══════ -->
+<section class="sec sw" id="s-prev" style="position:relative;overflow:hidden">
+  <!-- Decorative: grid/registration marks -->
+<div class="si">
+    <div class="sh rv">
+      <div class="sh-num">02</div>
+      <div class="sh-r"><div class="sh-tag">Sezione due</div><h2 class="sh-h2">Preventivo e<br><em>pianificazione</em></h2></div>
+    </div>
+    <p class="sp rv">La fase di <strong>preventivo</strong> è il punto di partenza. Si definiscono tutti gli aspetti del progetto prima di iniziare la produzione, per evitare imprevisti, errori e costi aggiuntivi.</p>
+    <div class="sh3 rv">Elementi da pianificare</div>
+    <ul class="slist rv">
+      <li>Tempi di produzione e data di consegna finale</li>
+      <li>Quantità di copie da stampare</li>
+      <li>Tipo di carta e <strong>grammatura</strong> (g/m²)</li>
+      <li>Numero e tipo di colori: CMYK, Pantone, tinte piatte</li>
+      <li>Formato finito e formato di stampa</li>
+      <li>Tipo di finitura: plastificazione, verniciatura UV, fustellatura</li>
+      <li>Modalità di rilegatura o confezione</li>
+    </ul>
+    <div class="sh3 rv">Parametri tecnici</div>
+    <table class="stab rv">
+      <thead><tr><th>Parametro</th><th>Esempi tipici</th><th>Impatto</th></tr></thead>
+      <tbody>
+        <tr><td>Formato</td><td>A4, A5, 21×21 cm</td><td>Costo carta, ottimizzazione foglio macchina</td></tr>
+        <tr><td>Grammatura</td><td>90 g · 150 g · 300 g</td><td>Qualità, spessore, costo, resa cromatica</td></tr>
+        <tr><td>Colori</td><td>4+0 · 4+4 · 1+0</td><td>Numero di lastre, passaggi macchina</td></tr>
+        <tr><td>Finiture</td><td>Opaca · Lucida · UV spot</td><td>Post-stampa, tempi aggiuntivi</td></tr>
+        <tr><td>Quantità</td><td>500 · 1.000 · 5.000+</td><td>Costo unitario, economie di scala</td></tr>
+      </tbody>
+    </table>
+    <div class="cal cr2 rv">
+      <div class="cal-lbl">Attenzione agli errori</div>
+      <p class="cal-p">Errori in fase di preventivo si ripercuotono su tutte le fasi successive. Un formato sbagliato o una grammatura non specificata possono aumentare i costi in modo significativo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ 03 BOZZE ══════ -->
+<section class="sec sm" id="s-bozze">
+  <div class="si">
+    <div class="sh rv">
+      <div class="sh-num">03</div>
+      <div class="sh-r"><div class="sh-tag">Sezione tre</div><h2 class="sh-h2">Bozze e prove<br><em>non contrattuali</em></h2></div>
+    </div>
+    <p class="sp rv">Le <strong>bozze</strong> sono stampe di prova non definitive per verificare l'aspetto del progetto prima della stampa finale. Non rappresentano un impegno contrattuale sul colore.</p>
+    <div class="cgrid rv">
+      <div class="ci"><div class="ci-icon">💻</div><div class="ci-h">Bozza PDF</div><div class="ci-p">Verifica digitale su schermo, rapida e gratuita</div></div>
+      <div class="ci"><div class="ci-icon">🖨</div><div class="ci-h">Bozza cartacea</div><div class="ci-p">Stampa su printer laser o inkjet per valutare il layout fisico</div></div>
+      <div class="ci"><div class="ci-icon">📋</div><div class="ci-h">Blueline</div><div class="ci-p">Bozza fotografica per verificare impaginazione prima delle lastre</div></div>
+    </div>
+    <ul class="slist rv">
+      <li>Verificare correttezza del testo: ortografia, sillabazione, impaginazione</li>
+      <li>Controllare la disposizione degli elementi grafici e delle immagini</li>
+      <li>Valutare proporzioni e rapporti visivi tra elementi diversi</li>
+      <li>Individuare errori prima che diventino costosi da correggere</li>
+    </ul>
+    <div class="cal cg2 rv">
+      <div class="cal-lbl">Regola fondamentale</div>
+      <p class="cal-p">Bozze frequenti nelle fasi iniziali. Man mano che la produzione avanza le modifiche devono ridursi: ogni revisione nelle fasi avanzate aumenta tempi e costi in modo esponenziale.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ 04 PROVE COLORE ══════ -->
+<section class="sec sd" id="s-prove" style="position:relative;overflow:hidden">
+<div class="si">
+    <div class="sh rv">
+      <div class="sh-num">04</div>
+      <div class="sh-r"><div class="sh-tag">Sezione quattro</div><h2 class="sh-h2">Prove colore<br><em>contrattuali</em></h2></div>
+    </div>
+    <p class="sp rv">La <strong>prova colore contrattuale</strong> è la stampa di riferimento che vincola la stamperia a replicare fedelmente quei colori. È un documento ufficiale firmato dal cliente.</p>
+    <div class="sh3 rv">La quadricromia CMYK — hover per espandere</div>
+    <div class="cmyk rv">
+      <div class="cmyk-c">C · Ciano</div>
+      <div class="cmyk-m">M · Magenta</div>
+      <div class="cmyk-y">Y · Giallo</div>
+      <div class="cmyk-k">K · Nero</div>
+    </div>
+    <ul class="slist rv">
+      <li>Realizzata con sistemi calibrati (standard <strong>Fogra, ISO 12647</strong>)</li>
+      <li>Stampata su carta simile a quella di produzione (es. 150 g/m² patinata)</li>
+      <li>Riporta strisce di controllo cromatico e scala di densità</li>
+      <li>Firmata dal cliente: <strong>approvazione finale</strong> prima della stampa</li>
+    </ul>
+    <div class="sh3 rv">Flusso di approvazione</div>
+    <div class="fdiag rv">
+      <div class="fd-b fdb-b">File digitale</div><div class="fd-a">→</div>
+      <div class="fd-b fdb-n">RIP + ICC</div><div class="fd-a">→</div>
+      <div class="fd-b fdb-g">Prova colore</div><div class="fd-a">→</div>
+      <div class="fd-b fdb-t">Approvazione</div><div class="fd-a">→</div>
+      <div class="fd-b fdb-r">Stampa</div>
+    </div>
+    <div class="sh3 rv">05 — Ciano grafiche</div>
+    <p class="sp rv">Il <strong>ciano grafico</strong> è la verifica finale dell'impaginazione prima della stampa. Controlla disposizione pagine e segni di taglio — non valuta il colore.</p>
+    <ul class="slist rv">
+      <li>Controllo dell'ordine e disposizione delle pagine</li>
+      <li>Verifica dei segni di piega, taglio e abbondanza (margini al vivo)</li>
+      <li>Ultima occasione per correzioni prima dell'incisione delle lastre</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════ 06 GESTIONE COLORE ══════ -->
+<section class="sec sw" id="s-col">
+  <div class="si">
+    <div class="sh rv">
+      <div class="sh-num">06</div>
+      <div class="sh-r"><div class="sh-tag">Sezione sei</div><h2 class="sh-h2">Gestione del<br><em>colore</em></h2></div>
+    </div>
+    <div class="bq rv">
+      <div class="bq-m">"</div>
+      <p class="bq-t">Il colore che vedi sullo schermo non è mai identico a quello stampato — la gestione del colore è il tentativo di ridurre al minimo questa differenza.</p>
+    </div>
+    <p class="sp rv">La <strong>gestione del colore</strong> garantisce che i colori visualizzati sullo schermo corrispondano il più possibile a quelli stampati. Coinvolge monitor, software, RIP e macchina da stampa.</p>
+    <div class="sh3 rv">Profili ICC</div>
+    <ul class="slist rv">
+      <li><strong>sRGB / AdobeRGB</strong> — standard per monitor e fotografia digitale</li>
+      <li><strong>ISO Coated v2 / Fogra39</strong> — profilo CMYK per carta patinata lucida, standard europeo</li>
+      <li><strong>Fogra51 / PSO Uncoated</strong> — profilo per carta opaca e non patinata</li>
+      <li><strong>GRACoL</strong> — standard americano per la stampa commerciale</li>
+    </ul>
+    <div class="cal cb2 rv">
+      <div class="cal-lbl">Regola pratica</div>
+      <p class="cal-p">Esportare sempre in CMYK con il profilo ICC corretto prima di inviare in stampa. Un file RGB non convertito può produrre colori completamente imprevisti.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ 07 CARTA ══════ -->
+<section class="sec sm" id="s-carta">
+  <div class="si">
+    <div class="sh rv">
+      <div class="sh-num">07</div>
+      <div class="sh-r"><div class="sh-tag">Sezione sette</div><h2 class="sh-h2">Scelta<br><em>della carta</em></h2></div>
+    </div>
+    <p class="sp rv">La carta influenza determinantemente l'aspetto finale: resa del colore, leggibilità del testo, peso percepito e sensazione di qualità.</p>
+    <div class="sh3 rv">Seleziona il tipo — clicca</div>
+    <div class="prow rv" id="psel">
+      <div class="popt sel" data-p="lucida" onclick="selPaper(this)">
+        <div class="psw psg"></div>
+        <div class="ph">Lucida (Gloss)</div><div class="psub">Brillante · Vivida</div>
+      </div>
+      <div class="popt" data-p="satinata" onclick="selPaper(this)">
+        <div class="psw pss"></div>
+        <div class="ph">Satinata (Silk)</div><div class="psub">Equilibrata · Versatile</div>
+      </div>
+      <div class="popt" data-p="opaca" onclick="selPaper(this)">
+        <div class="psw psm"></div>
+        <div class="ph">Opaca (Matt)</div><div class="psub">Elegante · Leggibile</div>
+      </div>
+    </div>
+    <div class="pdesc rv" id="pdesc"><strong>Carta lucida:</strong> ideale per cataloghi, brochure e stampe fotografiche. I colori appaiono più saturi e luminosi. Le impronte digitali sono visibili e i testi lunghi risultano meno leggibili per i riflessi.</div>
+    <div class="sh3 rv">Grammature di riferimento</div>
+    <table class="stab rv">
+      <thead><tr><th>Grammatura</th><th>Utilizzo tipico</th><th>Sensazione</th></tr></thead>
+      <tbody>
+        <tr><td>80–100 g</td><td>Carta da ufficio, volantini economici</td><td>Leggera, leggermente trasparente</td></tr>
+        <tr><td>115–135 g</td><td>Riviste, brochure standard</td><td>Maneggevole, buona opacità</td></tr>
+        <tr><td>150–170 g</td><td>Cataloghi, libri illustrati</td><td>Consistente, qualità media-alta</td></tr>
+        <tr><td>250–350 g</td><td>Copertine, biglietti da visita</td><td>Rigida, qualità premium</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════ 08–09 FOGLIO + SEGNATURE ══════ -->
+<section class="sec sd" id="s-fog" style="position:relative;overflow:hidden">
+  <div class="si">
+    <div class="sh rv">
+      <div class="sh-num">08</div>
+      <div class="sh-r"><div class="sh-tag">Sezione otto</div><h2 class="sh-h2">Foglio macchina<br><em>e produzione</em></h2></div>
+    </div>
+    <p class="sp rv">Il <strong>foglio macchina</strong> è il grande foglio su cui la macchina offset stampa più pagine contemporaneamente, ottimizzando carta e costi per grandi tirature.</p>
+    <div class="cgrid rv">
+      <div class="ci"><div class="ci-h">Margini al vivo</div><div class="ci-p">3–5 mm oltre il bordo di taglio per evitare strisce bianche</div></div>
+      <div class="ci"><div class="ci-h">Crocini di registro</div><div class="ci-p">Allineamento tra i 4 colori CMYK per la perfetta sovrapposizione</div></div>
+      <div class="ci"><div class="ci-h">Scale di colore</div><div class="ci-p">Strisce ai bordi per il controllo densitometrico durante la tiratura</div></div>
+      <div class="ci"><div class="ci-h">Tacche di piegatura</div><div class="ci-p">Linee guida per le operazioni di piegatura nel post-stampa</div></div>
+    </div>
+    <div id="s-seg" style="scroll-margin-top:54px">
+      <div class="sh3 rv">09 — Segnature: schema foglio → libro</div>
+      <p class="sp rv">Le <strong>segnature</strong> sono fogli stampati e piegati che formano gruppi di pagine ordinate. Le pagine vengono disposte secondo uno schema (imposition) per risultare corrette dopo la piegatura.</p>
+      <div class="segvis rv">
+        <div class="sfog">
+          <div class="sfp r">4</div><div class="sfp">1</div>
+          <div class="sfp">2</div><div class="sfp r">3</div>
+        </div>
+        <div class="sfold">piega e ottieni</div>
+        <div class="spages">
+          <div class="sbp sl r">1</div><div class="sbp">2</div>
+          <div class="sbp">3</div><div class="sbp sr r">4</div>
+        </div>
+        <div class="scap">Le pagine rosse sono fronte/retro della stessa facciata — quaderno da 4 pagine</div>
+      </div>
+      <ul class="slist rv">
+        <li><strong>Quaderno (8 pag.)</strong> — un foglio piegato 2 volte</li>
+        <li><strong>Ottavo (16 pag.)</strong> — un foglio piegato 3 volte, standard editoriale</li>
+        <li><strong>Sedicesimo (32 pag.)</strong> — un foglio piegato 4 volte, per grandi volumi</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ 10–11 OFFSET ══════ -->
+<section class="sec sw" id="s-off">
+  <div class="si">
+    <div class="sh rv">
+      <div class="sh-num">10</div>
+      <div class="sh-r"><div class="sh-tag">Sezione dieci</div><h2 class="sh-h2">Stampa offset:<br><em>come funziona</em></h2></div>
+    </div>
+    <p class="sp rv">La <strong>stampa offset</strong> è la tecnica più diffusa per tirature medio-alte. Si basa sul principio litografico: acqua e inchiostro non si mescolano. L'immagine passa dalla lastra al caucciù e poi alla carta — stampa <strong>indiretta</strong>.</p>
+    <div class="sh3 rv">I tre cilindri — clicca per scoprirne la funzione</div>
+    <div class="omach rv">
+      <div class="om-lbl">Schema macchina offset · Unità di stampa</div>
+      <div class="cyls">
+        <div class="cunit">
+          <div class="cyl c-l" id="cy-l" onclick="showCyl('l')"><div class="cyl-inner-ring"></div>Cilindro<br>lastra</div>
+          <div class="cnl">Lastra alluminio</div>
+        </div>
+        <div class="cconn"><div class="cdots"><div class="cdot"></div><div class="cdot"></div><div class="cdot"></div></div></div>
+        <div class="cunit">
+          <div class="cyl c-c" id="cy-c" onclick="showCyl('c')"><div class="cyl-inner-ring"></div>Cilindro<br>caucciù</div>
+          <div class="cnl">Gomma sintetica</div>
+        </div>
+        <div class="cconn"><div class="cdots"><div class="cdot"></div><div class="cdot"></div><div class="cdot"></div></div></div>
+        <div class="cunit">
+          <div class="cyl c-p" id="cy-p" onclick="showCyl('p')"><div class="cyl-inner-ring"></div>Cilindro<br>pressione</div>
+          <div class="cnl">Supporto carta</div>
+        </div>
+      </div>
+      <div class="minfo" id="minfo">
+        <div class="minfo-t" id="minfo-t">Seleziona un cilindro</div>
+        <span id="minfo-b">Clicca su uno dei tre cilindri per scoprirne la funzione nella macchina offset.</span>
+      </div>
+    </div>
+    <div class="sh3 rv">Sistemi di inchiostrazione e bagnatura</div>
+    <ul class="slist rv">
+      <li><strong>Sistema di bagnatura</strong> — distribuisce acqua sulla lastra; le zone non stampanti (idrofile) respingono l'inchiostro</li>
+      <li><strong>Sistema di inchiostrazione</strong> — rulli distribuiscono l'inchiostro sulle zone stampanti (oleofile) della lastra</li>
+      <li>L'equilibrio acqua/inchiostro è determinante per la qualità finale</li>
+    </ul>
+    <div class="cal ct2 rv">
+      <div class="cal-lbl">Vantaggi dell'offset</div>
+      <p class="cal-p">Alta qualità e uniformità del colore · Velocità fino a 15.000 fogli/ora · Ottima resa su carta patinata · Costo unitario basso per grandi tirature · Possibilità di stampa con Pantone.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ 12–13 POST-STAMPA ══════ -->
+<section class="sec sm" id="s-post">
+  <div class="si">
+    <div class="sh rv">
+      <div class="sh-num">12</div>
+      <div class="sh-r"><div class="sh-tag">Sezione dodici</div><h2 class="sh-h2">Post-stampa<br><em>e legatoria</em></h2></div>
+    </div>
+    <p class="sp rv">La fase di <strong>post-stampa</strong> trasforma le segnature stampate nel prodotto finito: rilegatura, finiture superficiali e taglio finale.</p>
+    <div class="sh3 rv">Timeline: dal foglio al libro finito</div>
+    <div class="tl rv">
+      <div class="tli"><div class="tll"><div class="tld db"></div><div class="tlln"></div></div><div class="tlb"><div class="tlh">Raccolta delle segnature</div><div class="tlp">Le segnature vengono raccolte in ordine sequenziale e impilate</div></div></div>
+      <div class="tli"><div class="tll"><div class="tld dt"></div><div class="tlln"></div></div><div class="tlb"><div class="tlh">Cucitura a filo refe</div><div class="tlp">Ogni segnatura viene cucita con filo di cotone alla precedente, creando il blocco libro</div></div></div>
+      <div class="tli"><div class="tll"><div class="tld dg"></div><div class="tlln"></div></div><div class="tlb"><div class="tlh">Applicazione della copertina</div><div class="tlp">Il blocco cucito viene incollato alla copertina (brossura morbida o cartonata rigida)</div></div></div>
+      <div class="tli"><div class="tll"><div class="tld dr"></div><div class="tlln"></div></div><div class="tlb"><div class="tlh">Taglio finale a tre lati</div><div class="tlp">Tre lati vengono tagliati per eliminare pieghe e pareggiare i bordi</div></div></div>
+      <div class="tli"><div class="tll"><div class="tld dn"></div></div><div class="tlb"><div class="tlh">Prodotto finito</div><div class="tlp">Controllo qualità e confezionamento</div></div></div>
+    </div>
+    <div class="sh3 rv">13 — Altre operazioni di finitura</div>
+    <div class="cgrid rv">
+      <div class="ci"><div class="ci-icon">✨</div><div class="ci-h">Plastificazione</div><div class="ci-p">Film plastico a caldo sulla copertina. Opaca o lucida. Protegge da graffi e umidità</div></div>
+      <div class="ci"><div class="ci-icon">📌</div><div class="ci-h">Punto metallico</div><div class="ci-p">Graffette per brochure, riviste e libretti con poche segnature</div></div>
+      <div class="ci"><div class="ci-icon">✂️</div><div class="ci-h">Fustellatura</div><div class="ci-p">Forme irregolari con fustelle in acciaio. Per packaging e biglietti sagomati</div></div>
+      <div class="ci"><div class="ci-icon">🔆</div><div class="ci-h">Verniciatura UV</div><div class="ci-p">Resina indurita con raggi UV, totale o spot su fondo opaco</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ ★ PREVENTIVO INTERATTIVO ══════ -->
+<section class="sec sd" id="s-calcprev" style="position:relative;overflow:hidden">
+<div class="si">
+    <div class="sh rv">
+      <div class="sh-num">★</div>
+      <div class="sh-r"><div class="sh-tag">Strumento interattivo</div><h2 class="sh-h2">Calcolatore<br><em>preventivo stampa</em></h2></div>
+    </div>
+    <p class="sp rv">Inserisci le specifiche del tuo lavoro e ottieni una stima orientativa del preventivo. I prezzi sono indicativi e variano per stamperia.</p>
+    <div class="prev-wrap rv">
+      <div class="prev-grid">
+        <div class="prev-col">
+          <div class="pfield">
+            <label>Nome progetto</label>
+            <input class="pinput" type="text" id="pv-nome" placeholder="es. Catalogo primavera 2026">
+          </div>
+          <div class="pfield">
+            <label>Formato</label>
+            <select class="pselect" id="pv-fmt">
+              <option value="a4">A4 (210 × 297 mm)</option>
+              <option value="a5">A5 (148 × 210 mm)</option>
+              <option value="a3">A3 (297 × 420 mm)</option>
+              <option value="q">Quadrato 21 × 21 cm</option>
+              <option value="bv">Biglietto da visita 85 × 55 mm</option>
+            </select>
+          </div>
+          <div class="pfield">
+            <label>Tipo di carta</label>
+            <select class="pselect" id="pv-carta">
+              <option value="1">Patinata lucida 150 g</option>
+              <option value="1.1">Patinata lucida 300 g (copertine)</option>
+              <option value="0.9">Patinata opaca 150 g</option>
+              <option value="0.85">Offset non patinata 90 g</option>
+              <option value="1.2">Cartoncino 350 g</option>
+            </select>
+          </div>
+          <div class="pfield">
+            <label>Numero di pagine: <span id="pv-pag-val" style="color:var(--red)">48</span></label>
+            <input class="prange" type="range" id="pv-pag" min="4" max="256" step="4" value="48" oninput="updateRange('pv-pag','pv-pag-val',v=>v+' pag.')">
+          </div>
+          <div class="pfield">
+            <label>Colori</label>
+            <select class="pselect" id="pv-col">
+              <option value="1">4+4 CMYK (fronte e retro)</option>
+              <option value="0.7">4+0 CMYK (solo fronte)</option>
+              <option value="1.4">4+4 + tinta piatta Pantone</option>
+              <option value="0.5">1+1 monocromatico</option>
+            </select>
+          </div>
+        </div>
+        <div class="prev-col">
+          <div class="pfield">
+            <label>Tiratura: <span id="pv-tir-val" style="color:var(--red)">1.000 copie</span></label>
+            <input class="prange" type="range" id="pv-tir" min="100" max="10000" step="100" value="1000" oninput="updateRange('pv-tir','pv-tir-val',v=>Number(v).toLocaleString('it')+' copie')">
+          </div>
+          <div class="pfield">
+            <label>Finiture speciali</label>
+            <div class="pcheck-group">
+              <label class="pcheck"><input type="checkbox" id="pv-plast" value="0.15"> Plastificazione opaca copertina</label>
+              <label class="pcheck"><input type="checkbox" id="pv-uv" value="0.12"> Verniciatura UV spot</label>
+              <label class="pcheck"><input type="checkbox" id="pv-fust" value="0.2"> Fustellatura</label>
+              <label class="pcheck"><input type="checkbox" id="pv-pantone" value="0.18"> Tinta piatta Pantone aggiuntiva</label>
+            </div>
+          </div>
+          <div class="pfield" style="margin-top:1rem">
+            <label>Rilegatura</label>
+            <select class="pselect" id="pv-ril">
+              <option value="1">Brossura fresata (colla)</option>
+              <option value="1.3">Cucitura a filo refe + copertina rigida</option>
+              <option value="0.8">Punto metallico (pinzatura)</option>
+              <option value="0.9">Spirale metallica</option>
+            </select>
+          </div>
+          <div class="pfield">
+            <label>Urgenza</label>
+            <select class="pselect" id="pv-urg">
+              <option value="1">Standard (10–15 giorni lavorativi)</option>
+              <option value="1.3">Rapido (5–7 giorni lavorativi) +30%</option>
+              <option value="1.6">Urgente (2–3 giorni lavorativi) +60%</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="pbtn" onclick="calcPrev()">GENERA PREVENTIVO →</button>
+      <div class="prev-out" id="prev-out">
+        <div class="prev-result" id="prev-result"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ 14 CONCLUSIONE ══════ -->
+<section class="sec sw" id="s-conc">
+  <div class="si">
+    <div class="sh rv">
+      <div class="sh-num">14</div>
+      <div class="sh-r"><div class="sh-tag">Conclusione</div><h2 class="sh-h2">Il flusso<br><em>completo</em></h2></div>
+    </div>
+    <p class="sp rv">Ogni prodotto stampato è il risultato di un percorso preciso e interconnesso. Conoscere ogni fase significa lavorare in modo più efficiente e consegnare prodotti di qualità superiore.</p>
+    <div class="cong rv">
+      <div class="conc"><div class="con-n">01</div><div class="con-h">Progettazione</div><div class="con-p">Preventivo, formati, materiali, specifiche</div></div>
+      <div class="conc"><div class="con-n">02</div><div class="con-h">Bozze</div><div class="con-p">Verifica errori, modifiche e approvazioni</div></div>
+      <div class="conc"><div class="con-n">03</div><div class="con-h">Prove colore</div><div class="con-p">Approvazione contrattuale del colore</div></div>
+      <div class="conc"><div class="con-n">04</div><div class="con-h">Stampa offset</div><div class="con-p">Lastre, cilindri, segnature, fogli</div></div>
+      <div class="conc"><div class="con-n">05</div><div class="con-h">Finitura</div><div class="con-p">Legatoria, taglio, plastificazione</div></div>
+    </div>
+    <div class="cal cg2 rv">
+      <div class="cal-lbl">Da ricordare sempre</div>
+      <p class="cal-p">Un buon progetto grafico tiene conto fin dall'inizio di tutte le fasi produttive. La comunicazione con la stamperia e la conoscenza tecnica del processo distinguono un grafico professionista.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ AUTHOR ══════ -->
+<section class="auth-sec">
+  <div class="auth-inner">
+    <div class="auth-av">GA</div>
+    <div class="auth-t">
+      <h2>Gabriele Alari</h2>
+      <p>Organizzazione dei processi produttivi</p>
+    </div>
+    <div class="auth-meta">
+      <div class="am-item"><span class="am-l">Materia</span><span class="am-v">Organizzazione dei processi produttivi</span></div>
+      <div class="am-item"><span class="am-l">Sezioni</span><span class="am-v">14 + preventivo</span></div>
+      <div class="am-item"><span class="am-l">Anno</span><span class="am-v">2025–2026</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="ft-l">Il Processo di Stampa · Gabriele Alari · 2026</div>
+  <div class="ft-r">Organizzazione dei processi produttivi · <span>Offset · CMYK · Post-stampa</span></div>
+</footer>
+
+<script>
+// ══ LOADER ══
+window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('LD').classList.add('out'),2800)})
+
+// ══ CURSOR ══
+const CUR=document.getElementById('CUR'),cd=document.getElementById('cd'),cr=document.getElementById('cr'),ci=document.getElementById('ci')
+let mx=0,my=0,rx=0,ry=0
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cd.style.left=mx+'px';cd.style.top=my+'px';ci.style.left=mx+'px';ci.style.top=my+'px'})
+;(function tick(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;cr.style.left=rx+'px';cr.style.top=ry+'px';requestAnimationFrame(tick)})()
+document.querySelectorAll('a,button,.cyl,.popt,.ci,.conc,.cmyk>div,.fd-b,.pbtn,.prange,.pselect,.pinput,.pcheck input').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('hov'))
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'))
+})
+document.querySelectorAll('.prange').forEach(el=>{
+  el.addEventListener('mousedown',()=>document.body.classList.add('drag'))
+  el.addEventListener('mouseup',()=>document.body.classList.remove('drag'))
+})
+
+// ══ HERO TITLE — letter glow on hover ══
+;(function(){
+  const lines = [
+    {id:'htl0', text:'IL PROCESSO', cls:'ht-line-0'},
+    {id:'htl1', text:'DI STAMPA',   cls:'ht-line-1'},
+    {id:'htl2', text:'OFFSET',      cls:'ht-line-2'},
+  ]
+  lines.forEach(({id, text}) => {
+    const el = document.getElementById(id)
+    if(!el) return
+    el.innerHTML = ''
+    ;[...text].forEach((ch, i) => {
+      const s = document.createElement('span')
+      s.className = 'ht-char'
+      s.dataset.i = i
+      s.dataset.line = id
+      s.textContent = ch === ' ' ? ' ' : ch
+      if(ch === ' ') s.style.display = 'inline'
+      el.appendChild(s)
+    })
+  })
+
+  // hover: light up hovered + neighbours
+  document.querySelectorAll('.ht-char').forEach(span => {
+    span.addEventListener('mouseenter', () => {
+      const lineId = span.dataset.line
+      const idx = parseInt(span.dataset.i)
+      const siblings = document.querySelectorAll(`#${lineId} .ht-char`)
+      siblings.forEach(s => {
+        const d = Math.abs(parseInt(s.dataset.i) - idx)
+        s.classList.remove('near')
+        if(d === 0) { /* handled by CSS :hover */ }
+        else if(d <= 2) s.classList.add('near')
+        else s.classList.remove('near')
+      })
+    })
+    span.addEventListener('mouseleave', () => {
+      const lineId = span.dataset.line
+      document.querySelectorAll(`#${lineId} .ht-char`).forEach(s => s.classList.remove('near'))
+    })
+  })
+})()
+
+// ══ NAV SCROLL PROGRESS ══
+const npf=document.getElementById('npf')
+window.addEventListener('scroll',()=>{
+  const pct=window.scrollY/(document.body.scrollHeight-window.innerHeight)*100
+  npf.style.width=Math.min(pct,100)+'%'
+})
+
+// ══ NAV ACTIVE ══
+const navLinks=document.querySelectorAll('#navlinks a')
+const obNav=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navLinks.forEach(a=>a.classList.remove('active'))
+      const a=document.querySelector(`#navlinks a[href="#${e.target.id}"]`)
+      if(a){a.classList.add('active');a.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'})}
+    }
+  })
+},{rootMargin:'-30% 0px -60% 0px'})
+document.querySelectorAll('.sec[id],header[id]').forEach(s=>obNav.observe(s))
+
+// ══ SCROLL REVEAL ══
+const obRev=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){e.target.classList.add('vis');obRev.unobserve(e.target)}
+  })
+},{threshold:0.07})
+document.querySelectorAll('.rv,.rv2').forEach((el,i)=>{if(!el.style.transitionDelay)el.style.transitionDelay=(i%6)*.07+'s';obRev.observe(el)})
+
+// ══ SEC DECO (scroll-triggered) ══
+const obDeco=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting)e.target.classList.add('in-view')
+    else e.target.classList.remove('in-view')
+  })
+},{threshold:0.2})
+document.querySelectorAll('.sec').forEach(s=>obDeco.observe(s))
+
+// ══ HERO CANVAS — animated ink blobs ══
+const hc=document.getElementById('hc')
+const hctx=hc.getContext('2d')
+function resizeHC(){hc.width=hc.offsetWidth;hc.height=hc.offsetHeight}
+resizeHC();window.addEventListener('resize',resizeHC)
+const blobs=Array.from({length:6},(_,i)=>({
+  x:Math.random()*800+200,y:Math.random()*600,
+  vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.3,
+  r:Math.random()*120+60,
+  color:i<2?'rgba(192,57,43,':'rgba(240,230,200,',
+  a:Math.random()*.04+.015
+}))
+function animHero(){
+  if(!hc.width)return
+  hctx.clearRect(0,0,hc.width,hc.height)
+  blobs.forEach(b=>{
+    b.x+=b.vx;b.y+=b.vy
+    if(b.x<-b.r)b.x=hc.width+b.r
+    if(b.x>hc.width+b.r)b.x=-b.r
+    if(b.y<-b.r)b.y=hc.height+b.r
+    if(b.y>hc.height+b.r)b.y=-b.r
+    const g=hctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r)
+    g.addColorStop(0,b.color+b.a+')')
+    g.addColorStop(1,b.color+'0)')
+    hctx.beginPath();hctx.arc(b.x,b.y,b.r,0,Math.PI*2)
+    hctx.fillStyle=g;hctx.fill()
+  })
+  requestAnimationFrame(animHero)
+}
+animHero()
+
+// ══ PARTICLES (floating ink dots) ══
+const pc=document.getElementById('particles'),pctx=pc.getContext('2d')
+function resizePC(){pc.width=window.innerWidth;pc.height=window.innerHeight}
+resizePC();window.addEventListener('resize',resizePC)
+const pts=Array.from({length:40},()=>({
+  x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,
+  vx:(Math.random()-.5)*.15,vy:-Math.random()*.2-.05,
+  r:Math.random()*2+0.5,
+  a:Math.random()*.3+.05,life:Math.random()
+}))
+function animPts(){
+  pctx.clearRect(0,0,pc.width,pc.height)
+  pts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.life+=.003
+    if(p.y<-5){p.y=pc.height+5;p.x=Math.random()*pc.width;p.life=0}
+    const fade=Math.sin(p.life*Math.PI)*p.a
+    pctx.beginPath();pctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+    pctx.fillStyle=`rgba(192,57,43,${fade})`
+    pctx.fill()
+  })
+  requestAnimationFrame(animPts)
+}
+animPts()
+
+// ══ MOUSE PARALLAX on particles ══
+document.addEventListener('mousemove',e=>{
+  const px=e.clientX/window.innerWidth-.5,py=e.clientY/window.innerHeight-.5
+  pts.forEach((p,i)=>{if(i%3===0){p.x+=px*.5;p.y+=py*.5}})
+})
+
+// ══ SECTION DECO ROTATION ══
+const dw=document.getElementById('deco-wheel')
+if(dw){
+  let deg=0
+  setInterval(()=>{deg+=.2;dw.style.transform=`rotate(${deg}deg)`},16)
+}
+
+// ══ CYLINDER INFO ══
+const cylData={
+  l:{n:'Cilindro lastra',t:'Contiene la lastra di alluminio su cui è incisa l\'immagine. Le zone stampanti sono oleofile: trattengono l\'inchiostro. Le zone non stampanti sono idrofile: trattengono l\'acqua e respingono l\'inchiostro.'},
+  c:{n:'Cilindro caucciù (blanket)',t:'Rivestito di gomma sintetica, riceve l\'immagine dalla lastra e la trasferisce sulla carta. La gomma si adatta alla texture della carta garantendo uniformità — questo è il motivo per cui la tecnica si chiama "offset" (impressione indiretta).'},
+  p:{n:'Cilindro di pressione',t:'Non porta inchiostro. Tiene ferma la carta e la spinge contro il caucciù con la pressione necessaria per una stampa nitida e uniforme. La carta scorre tra il caucciù e questo cilindro.'}
+}
+function showCyl(k){
+  document.getElementById('minfo-t').textContent=cylData[k].n
+  document.getElementById('minfo-b').textContent=cylData[k].t
+  document.querySelectorAll('.cyl').forEach(c=>c.classList.remove('act'))
+  document.getElementById('cy-'+k).classList.add('act')
+}
+
+// ══ PAPER SELECTOR ══
+const pd={
+  lucida:'<strong>Carta lucida (Gloss):</strong> ideale per cataloghi, brochure e stampe fotografiche. I colori appaiono più saturi e luminosi. Le impronte digitali sono visibili e i testi lunghi risultano meno leggibili per i riflessi.',
+  satinata:'<strong>Carta satinata (Silk):</strong> equilibrio tra lucida e opaca. Buona resa cromatica con meno riflessi. Perfetta per riviste e brochure di qualità con testo e immagini.',
+  opaca:'<strong>Carta opaca (Matt):</strong> nessun riflesso, leggibilità ottimale, aspetto elegante. Preferita per libri, relazioni annuali e comunicazioni istituzionali. Colori leggermente meno saturi ma più sofisticati.'
+}
+function selPaper(el){
+  document.querySelectorAll('.popt').forEach(p=>p.classList.remove('sel'));el.classList.add('sel')
+  const box=document.getElementById('pdesc');box.style.opacity='0'
+  setTimeout(()=>{box.innerHTML=pd[el.dataset.p];box.style.opacity='1'},180)
+}
+document.getElementById('pdesc').style.transition='opacity .2s'
+
+// ══ RANGE UPDATE ══
+function updateRange(id,valId,fmt){
+  const v=document.getElementById(id).value
+  document.getElementById(valId).textContent=fmt(v)
+}
+
+// ══ PREVENTIVO CALCULATOR ══
+const fmtNames={a4:'A4 (210×297 mm)',a5:'A5 (148×210 mm)',a3:'A3 (297×420 mm)',q:'Quadrato 21×21 cm',bv:'Biglietto da visita 85×55 mm'}
+const fmtMult={a4:1,a5:0.7,a3:1.6,q:0.85,bv:0.3}
+const cartaNames={1:'Patinata lucida 150 g',1.1:'Patinata lucida 300 g',0.9:'Patinata opaca 150 g',0.85:'Offset non patinata 90 g',1.2:'Cartoncino 350 g'}
+const rilNames={1:'Brossura fresata',1.3:'Cucitura a filo refe',0.8:'Punto metallico',0.9:'Spirale metallica'}
+const urgNames={1:'Standard (10–15 gg)',1.3:'Rapido (5–7 gg)',1.6:'Urgente (2–3 gg)'}
+
+function calcPrev(){
+  const nome=document.getElementById('pv-nome').value||'Progetto senza nome'
+  const fmt=document.getElementById('pv-fmt').value
+  const carta=parseFloat(document.getElementById('pv-carta').value)
+  const pag=parseInt(document.getElementById('pv-pag').value)
+  const tir=parseInt(document.getElementById('pv-tir').value)
+  const col=parseFloat(document.getElementById('pv-col').value)
+  const ril=parseFloat(document.getElementById('pv-ril').value)
+  const urg=parseFloat(document.getElementById('pv-urg').value)
+  const plast=document.getElementById('pv-plast').checked
+  const uv=document.getElementById('pv-uv').checked
+  const fust=document.getElementById('pv-fust').checked
+  const pant=document.getElementById('pv-pantone').checked
+
+  // base cost calculation (indicative)
+  const basePerCopia = 0.08 * fmtMult[fmt] * carta * col * (pag/48) * ril
+  let finExtra = 0
+  if(plast) finExtra += 0.015
+  if(uv) finExtra += 0.012
+  if(fust) finExtra += 0.02
+  if(pant) finExtra += 0.018
+
+  const setupCost = 180 * fmtMult[fmt] * col  // lastre, setup
+  const totalPerCopia = (basePerCopia + finExtra) * urg
+  const totalVar = totalPerCopia * tir
+  const total = (setupCost + totalVar)
+  const unitCost = total / tir
+
+  const finStr = [plast?'Plastificazione':'',uv?'UV spot':'',fust?'Fustellatura':'',pant?'Pantone aggiuntivo':''].filter(Boolean).join(', ')||'Nessuna'
+  const now = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})
+
+  document.getElementById('prev-result').innerHTML = `
+    <div class="pr-head">
+      <div><div class="pr-title">${nome}</div><div class="pr-date">Preventivo indicativo · ${now}</div></div>
+    </div>
+    <div class="pr-grid">
+      <div class="pr-cell"><div class="pr-cell-l">Formato</div><div class="pr-cell-v">${fmtNames[fmt]}</div></div>
+      <div class="pr-cell"><div class="pr-cell-l">Carta</div><div class="pr-cell-v">${cartaNames[carta]}</div></div>
+      <div class="pr-cell"><div class="pr-cell-l">Pagine</div><div class="pr-cell-v">${pag} pp.</div></div>
+      <div class="pr-cell"><div class="pr-cell-l">Tiratura</div><div class="pr-cell-v">${Number(tir).toLocaleString('it')} copie</div></div>
+      <div class="pr-cell"><div class="pr-cell-l">Rilegatura</div><div class="pr-cell-v">${rilNames[ril]}</div></div>
+      <div class="pr-cell"><div class="pr-cell-l">Finiture</div><div class="pr-cell-v" style="font-size:13px">${finStr}</div></div>
+      <div class="pr-cell"><div class="pr-cell-l">Consegna</div><div class="pr-cell-v">${urgNames[urg]}</div></div>
+      <div class="pr-cell"><div class="pr-cell-l">Costo unitario</div><div class="pr-cell-v">€ ${unitCost.toFixed(2)}</div></div>
+    </div>
+    <div class="pr-price">
+      <div class="pr-p-lbl">Totale stimato</div>
+      <div class="pr-p-val">€ ${Math.round(total).toLocaleString('it')}</div>
+      <div class="pr-p-note">IVA esclusa · orientativo</div>
+    </div>
+    <div class="pr-notes">Preventivo generato automaticamente a scopo didattico. I prezzi reali variano in base alla stamperia, alla qualità dei materiali e alle condizioni di mercato. Richiedere sempre un preventivo ufficiale alla stamperia.</div>
+  `
+  const out=document.getElementById('prev-out');out.classList.add('show')
+  out.scrollIntoView({behavior:'smooth',block:'nearest'})
+}
+
+// ══ ANIMATED SECTION DECORATIVES ══
+// Rotate deco wheel continuously
+setInterval(()=>{
+  document.querySelectorAll('.sec-deco svg').forEach((svg,i)=>{
+    svg._r=(svg._r||0)+(.15*(i%2?1:-1));svg.style.transform=`rotate(${svg._r}deg)`
+  })
+},30)
+
+// ══════════════════════════════════════════════
+//  ENHANCED ANIMATIONS v6
+// ══════════════════════════════════════════════
+
+// ── Cursor trail ──
+;(function(){
+  const canvas = document.getElementById('ctrail')
+  if(!canvas) return
+  const ctx = canvas.getContext('2d')
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+  window.addEventListener('resize', () => { canvas.width=window.innerWidth; canvas.height=window.innerHeight })
+
+  const trail = []
+  const MAX = 28
+  let tmx = 0, tmy = 0
+
+  document.addEventListener('mousemove', e => { tmx=e.clientX; tmy=e.clientY })
+
+  function drawTrail() {
+    ctx.clearRect(0,0,canvas.width,canvas.height)
+    trail.push({x:tmx, y:tmy, age:0})
+    if(trail.length > MAX) trail.shift()
+    trail.forEach((p,i) => {
+      p.age++
+      const t = i/trail.length
+      const alpha = t * 0.18 * (1 - p.age/60)
+      const r = t * 6 + 1
+      if(alpha > 0) {
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, r, 0, Math.PI*2)
+        ctx.fillStyle = `rgba(192,57,43,${alpha})`
+        ctx.fill()
+      }
+    })
+    requestAnimationFrame(drawTrail)
+  }
+  drawTrail()
+})()
+
+// ── Section header line grow on enter ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        const sh = e.target.querySelector('.sh')
+        if(sh) {
+          sh.classList.add('line-grown')
+          // Flash the big number
+          const num = sh.querySelector('.sh-num')
+          if(num) { num.classList.add('flash'); setTimeout(()=>num.classList.remove('flash'),700) }
+        }
+        // Animate sh3 lines
+        e.target.querySelectorAll('.sh3').forEach((el,i) => {
+          setTimeout(() => el.classList.add('line-grown'), 400 + i*200)
+        })
+        ob.unobserve(e.target)
+      }
+    })
+  }, {threshold:0.1})
+  document.querySelectorAll('.sec').forEach(s => ob.observe(s))
+})()
+
+// ── Word-by-word reveal on h2 ──
+;(function(){
+  document.querySelectorAll('.sh-h2').forEach(h2 => {
+    const raw = h2.innerHTML
+    // wrap each word (preserve em tags and <br>)
+    h2.innerHTML = raw.replace(/(<[^>]+>)|([^<\s]+)/g, (m, tag, word) => {
+      if(tag) return tag
+      return `<span class="wr-word">${word}</span>`
+    })
+  })
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        e.target.querySelectorAll('.wr-word').forEach((w,i) => {
+          setTimeout(() => w.classList.add('in'), i*70)
+        })
+        ob.unobserve(e.target)
+      }
+    })
+  }, {threshold:0.2})
+  document.querySelectorAll('.sh-h2').forEach(el => ob.observe(el))
+})()
+
+// ── List items stagger ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('revealed'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.1})
+  document.querySelectorAll('.slist').forEach(el => ob.observe(el))
+})()
+
+// ── Callout slide-in ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('cal-in'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.15})
+  document.querySelectorAll('.cal').forEach(el => ob.observe(el))
+})()
+
+// ── Table row stagger ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('revealed'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.1})
+  document.querySelectorAll('.stab').forEach(el => ob.observe(el))
+})()
+
+// ── CMYK bar reveal ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('revealed'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.3})
+  document.querySelectorAll('.cmyk').forEach(el => ob.observe(el))
+})()
+
+// ── Flow diagram boxes pop ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('revealed'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.2})
+  document.querySelectorAll('.fdiag').forEach(el => ob.observe(el))
+})()
+
+// ── Timeline animate ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('revealed'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.1})
+  document.querySelectorAll('.tl').forEach(el => ob.observe(el))
+})()
+
+// ── Cards grid ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('revealed'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.1})
+  document.querySelectorAll('.cgrid').forEach(el => ob.observe(el))
+})()
+
+// ── Conclusion cells ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('revealed'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.1})
+  document.querySelectorAll('.cong').forEach(el => ob.observe(el))
+})()
+
+// ── Paper row ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('revealed'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.15})
+  document.querySelectorAll('.prow').forEach(el => ob.observe(el))
+})()
+
+// ── Author section ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        e.target.querySelector('.auth-inner')?.classList.add('revealed')
+        ob.unobserve(e.target)
+      }
+    })
+  }, {threshold:0.2})
+  document.querySelectorAll('.auth-sec').forEach(s => ob.observe(s))
+})()
+
+// ── Card 3D tilt on mouse ──
+document.querySelectorAll('.ci').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect()
+    const cx = r.left + r.width/2, cy = r.top + r.height/2
+    const dx = (e.clientX - cx)/(r.width/2)
+    const dy = (e.clientY - cy)/(r.height/2)
+    card.style.transform = `translateY(-4px) rotateX(${-dy*6}deg) rotateY(${dx*6}deg) scale(1.02)`
+  })
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = ''
+  })
+})
+
+// ── Parallax lines on scroll ──
+;(function(){
+  const lines = document.querySelectorAll('.sec-parallax-line')
+  function updateParallax() {
+    const sy = window.scrollY
+    lines.forEach(line => {
+      const speed = parseFloat(line.dataset.speed || 0)
+      line.style.transform = `translateY(${sy * speed}px)`
+    })
+  }
+  window.addEventListener('scroll', updateParallax, {passive:true})
+  updateParallax()
+})()
+
+// ── Hoverable counter numbers (conclusion cells) ──
+;(function(){
+  document.querySelectorAll('.conc').forEach(cell => {
+    const numEl = cell.querySelector('.con-n')
+    if(!numEl) return
+    const baseText = numEl.textContent
+    cell.addEventListener('mouseenter', () => {
+      numEl.style.transition = 'color .3s'
+      numEl.style.color = 'rgba(192,57,43,.25)'
+    })
+    cell.addEventListener('mouseleave', () => {
+      numEl.style.color = ''
+    })
+  })
+})()
+
+// ── Callout border pulse on hover ──
+document.querySelectorAll('.cal').forEach(el => {
+  el.addEventListener('mouseenter', () => { el.style.borderLeftWidth = '5px' })
+  el.addEventListener('mouseleave', () => { el.style.borderLeftWidth = '' })
+})
+
+// ── Paragraph gradient shift on hover ──
+document.querySelectorAll('.sp').forEach(p => {
+  p.addEventListener('mouseenter', () => {
+    p.style.background = 'linear-gradient(120deg,var(--ink) 0%,var(--gold) 60%,var(--ink2) 100%)'
+    p.style.webkitBackgroundClip = 'text'
+    p.style.backgroundClip = 'text'
+    p.style.transition = 'background 0.4s'
+  })
+  p.addEventListener('mouseleave', () => {
+    p.style.background = ''
+    p.style.webkitBackgroundClip = ''
+    p.style.backgroundClip = ''
+  })
+})
+
+// ── sh3 headings line grow ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('line-grown'); ob.unobserve(e.target) }
+    })
+  }, {threshold:0.5})
+  document.querySelectorAll('.sh3').forEach(el => ob.observe(el))
+})()
+
+// ── Number ticker on big sh-num ──
+;(function(){
+  const ob = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(!e.isIntersecting) return
+      const el = e.target
+      const final = parseInt(el.textContent) || 0
+      if(!final) return
+      let cur = 0, frames = 0
+      const interval = setInterval(() => {
+        frames++
+        cur = Math.min(final, Math.round(final * (frames/20)))
+        el.textContent = String(cur).padStart(2,'0')
+        if(cur >= final) clearInterval(interval)
+      }, 40)
+      ob.unobserve(el)
+    })
+  }, {threshold:0.5})
+  document.querySelectorAll('.sh-num').forEach(el => {
+    if(!isNaN(parseInt(el.textContent))) ob.observe(el)
+  })
+})()
+
+</script>
+</body>
+</html>
